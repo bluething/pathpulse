@@ -16,13 +16,19 @@
     - *Positive*: Provides extreme durability. Isolates the ingestion layer from the database layer, allowing the system to absorb traffic bursts and defer writes.
     - *Negative*: Adds operational complexity. Requires ZooKeeper/KRaft cluster and disk management.
 
-## ADR-3: Utilizing TimescaleDB over Standard Postgres/NoSQL
+## ADR-3: Utilizing TimescaleDB over Document NoSQL (e.g., MongoDB)
 - **Status**: Accepted
-- **Context**: We need to perform large amounts of writes on mostly append-only time-ordered data. Traditional SQL databases experience index bloat and B-Tree structure decay when tables reach billions of rows, slowing down inserts significantly.
-- **Decision**: Opt for **TimescaleDB** (PostgreSQL extension) providing time-based chunking.
+- **Context**: The system must handle an extreme write throughput of entirely append-only, chronologically ordered location data. While document NoSQL databases like MongoDB provide vertical ingest scale and schema flexibility, they are fundamentally designed for discrete JSON document retrieval. Storing continuous location metrics as individual BSON documents leads to inefficient storage overhead, eventual B-Tree index bloat, and forces the use of complex, non-standard aggregation pipelines to perform fundamental geospatial or time-window analytics.
+- **Decision**: Opt for **TimescaleDB**, a time-series optimized extension for PostgreSQL relying on heavily partitioned hypertables.
 - **Consequences**:
-    - *Positive*: Avoids index bloat. Allows us to leverage existing mature C++ driver ecosystems (`libpqxx`) and SQL knowledge instead of learning proprietary NoSQL structures.
-    - *Negative*: Single-node configuration has an eventual limit compared to natively distributed systems like Cassandra, though this limit is very high and sufficient for 10k users.
+  - *Positive*:
+    - **Zero Index Bloat**: Automatically chunks table data by time/space boundaries, keeping the active write indexes significantly smaller and completely resident in RAM.
+    - **Geospatial & Analytic Superiority**: Native integration with PostGIS for powerful location-based queries (e.g., finding overlapping paths, point-in-polygon) and native Timescale window functions (like `time_bucket`), which are vastly simpler to execute than MongoDB aggregation pipelines.
+    - **Columnar Compression**: Older time chunks are automatically converted to compressed columnar storage behind the scenes, profoundly reducing the disk footprint compared to storing millions of uncompressed MongoDB documents.
+    - **Mature Drivers**: Allows the backend to utilize rock-solid, synchronous C++ Postgres drivers (`libpqxx`).
+  - *Negative*:
+    - Inherently lacks the "schemaless" flexibility of MongoDB (however, a location payload of lat/lng/timestamp is rigidly structured regardless).
+    - Requires active management of PostgreSQL extensions.
 
 ## ADR-4: Database Batch Writes
 - **Status**: Accepted
