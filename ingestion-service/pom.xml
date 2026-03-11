@@ -40,6 +40,12 @@
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
 
+        <!-- Kafka -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
         <!-- UUID Generator for UUIDv7 -->
         <dependency>
             <groupId>com.fasterxml.uuid</groupId>

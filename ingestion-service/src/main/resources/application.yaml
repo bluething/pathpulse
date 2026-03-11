@@ -1,11 +1,21 @@
 spring:
   application:
     name: ingestion-service
+  main:
+    banner-mode: off
 
   # Virtual Threads - Java 25 / Spring Boot 4 feature
   threads:
     virtual:
       enabled: true
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+# Custom Kafka topic configuration
+kafka:
+  topic:
+    location-events: location-events
 
 # Server configuration
 server:
