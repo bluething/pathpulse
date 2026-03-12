@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: storage-service
+  main:
+    banner-mode: off
+
+  # Virtual Threads - Java 25 / Spring Boot 4 feature
+  threads:
+    virtual:
+      enabled: true
+
+  datasource:
+    url: ${POSTGRES_URI:jdbc:postgresql://localhost:5432/locationdb}
+    username: ${POSTGRES_USER:root}
+    password: ${POSTGRES_PASSWORD:rootpassword}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+    flyway:
+      enabled: true
+      baseline-on-migrate: true
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: storage-service-group
+
+  # Spring Shell configuration
+  shell:
+    interactive:
+      enabled: true
+
+# Custom Kafka configuration
+kafka:
+  topic:
+    location-events: location-events
+  consumer:
+    concurrency: 3
+
+# Server configuration (for actuator)
+server:
+  port: 8082
+
+# Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+
+# Logging
+logging:
+  level:
+    com.locationtracking: DEBUG
+    org.hibernate.SQL: INFO
+    org.apache.kafka: WARN
