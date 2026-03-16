@@ -19,9 +19,10 @@ spring:
     hibernate:
       ddl-auto: none
 
-    flyway:
-      enabled: true
-      baseline-on-migrate: true
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db
 
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
