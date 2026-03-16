@@ -26,7 +26,7 @@ public class LocationCommands {
             String userId,
 
             @Option(longName = "limit", defaultValue = "10", description = "Maximum results")
-            int limit
+            Integer limit
     ) {
 
         List<LocationEntity> locations = locationService.getByUserId(userId, limit);
@@ -40,7 +40,7 @@ public class LocationCommands {
 
     @Command(description = "Get the latest locations across all users", name = "get-latest")
     public String getLatest(
-            @Option(defaultValue = "10", description = "Maximum results") int limit) {
+            @Option(defaultValue = "10", description = "Maximum results") Integer limit) {
 
         List<LocationEntity> locations = locationService.getLatest(limit);
 
